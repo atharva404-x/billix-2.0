@@ -3,88 +3,126 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.run = run;
-function _traverse() {
-  const data = require("@babel/traverse");
-  _traverse = function () {
-    return data;
-  };
-  return data;
-}
-var _pluginPass = require("./plugin-pass.js");
-var _blockHoistPlugin = require("./block-hoist-plugin.js");
-var _normalizeOpts = require("./normalize-opts.js");
-var _normalizeFile = require("./normalize-file.js");
-var _generate = require("./file/generate.js");
-var _deepArray = require("../config/helpers/deep-array.js");
-var _async = require("../gensync-utils/async.js");
-function* run(config, code, ast) {
-  const file = yield* (0, _normalizeFile.default)(config.passes, (0, _normalizeOpts.default)(config), code, ast);
-  const opts = file.opts;
-  try {
-    yield* transformFile(file, config.passes);
-  } catch (e) {
-    var _opts$filename;
-    e.message = `${(_opts$filename = opts.filename) != null ? _opts$filename : "unknown file"}: ${e.message}`;
-    if (!e.code) {
-      e.code = "BABEL_TRANSFORM_ERROR";
+var _templateLiterals = require("./template-literals.js");
+Object.keys(_templateLiterals).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _templateLiterals[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _templateLiterals[key];
     }
-    throw e;
-  }
-  let outputCode, outputMap;
-  try {
-    if (opts.code !== false) {
-      ({
-        outputCode,
-        outputMap
-      } = (0, _generate.default)(config.passes, file));
+  });
+});
+var _expressions = require("./expressions.js");
+Object.keys(_expressions).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _expressions[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _expressions[key];
     }
-  } catch (e) {
-    var _opts$filename2;
-    e.message = `${(_opts$filename2 = opts.filename) != null ? _opts$filename2 : "unknown file"}: ${e.message}`;
-    if (!e.code) {
-      e.code = "BABEL_GENERATE_ERROR";
+  });
+});
+var _statements = require("./statements.js");
+Object.keys(_statements).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _statements[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _statements[key];
     }
-    throw e;
-  }
-  return {
-    metadata: file.metadata,
-    options: opts,
-    ast: opts.ast === true ? file.ast : null,
-    code: outputCode === undefined ? null : outputCode,
-    map: outputMap === undefined ? null : outputMap,
-    sourceType: file.ast.program.sourceType,
-    externalDependencies: (0, _deepArray.flattenToSet)(config.externalDependencies)
-  };
-}
-function* transformFile(file, pluginPasses) {
-  const async = yield* (0, _async.isAsync)();
-  for (const pluginPairs of pluginPasses) {
-    const passPairs = [];
-    const passes = [];
-    const visitors = [];
-    for (const plugin of pluginPairs.concat([(0, _blockHoistPlugin.default)()])) {
-      const pass = new _pluginPass.default(file, plugin.key, plugin.options, async);
-      passPairs.push([plugin, pass]);
-      passes.push(pass);
-      visitors.push(plugin.visitor);
+  });
+});
+var _classes = require("./classes.js");
+Object.keys(_classes).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _classes[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _classes[key];
     }
-    for (const [plugin, pass] of passPairs) {
-      if (plugin.pre) {
-        const fn = (0, _async.maybeAsync)(plugin.pre, `You appear to be using an async plugin/preset, but Babel has been called synchronously`);
-        yield* fn.call(pass, file);
-      }
+  });
+});
+var _methods = require("./methods.js");
+Object.keys(_methods).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _methods[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _methods[key];
     }
-    const visitor = _traverse().default.visitors.merge(visitors, passes, file.opts.wrapPluginVisitorMethod);
-    (0, _traverse().default)(file.ast, visitor, file.scope);
-    for (const [plugin, pass] of passPairs) {
-      if (plugin.post) {
-        const fn = (0, _async.maybeAsync)(plugin.post, `You appear to be using an async plugin/preset, but Babel has been called synchronously`);
-        yield* fn.call(pass, file);
-      }
+  });
+});
+var _modules = require("./modules.js");
+Object.keys(_modules).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _modules[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _modules[key];
     }
-  }
-}
-0 && 0;
+  });
+});
+var _types = require("./types.js");
+Object.keys(_types).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _types[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _types[key];
+    }
+  });
+});
+var _flow = require("./flow.js");
+Object.keys(_flow).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _flow[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _flow[key];
+    }
+  });
+});
+var _base = require("./base.js");
+Object.keys(_base).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _base[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _base[key];
+    }
+  });
+});
+var _jsx = require("./jsx.js");
+Object.keys(_jsx).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _jsx[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _jsx[key];
+    }
+  });
+});
+var _typescript = require("./typescript.js");
+Object.keys(_typescript).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _typescript[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _typescript[key];
+    }
+  });
+});
 
 //# sourceMappingURL=index.js.map
