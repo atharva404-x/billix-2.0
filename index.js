@@ -3,72 +3,49 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.declare = declare;
-exports.declarePreset = void 0;
-const apiPolyfills = {
-  assertVersion: api => range => {
-    throwVersionError(range, api.version);
+exports.default = void 0;
+var _helperPluginUtils = require("@babel/helper-plugin-utils");
+var _core = require("@babel/core");
+const TRACE_ID = "__source";
+const FILE_NAME_VAR = "_jsxFileName";
+const createNodeFromNullish = (val, fn) => val == null ? _core.types.nullLiteral() : fn(val);
+var _default = exports.default = (0, _helperPluginUtils.declare)(api => {
+  api.assertVersion(7);
+  function makeTrace(fileNameIdentifier, {
+    line,
+    column
+  }) {
+    const fileLineLiteral = createNodeFromNullish(line, _core.types.numericLiteral);
+    const fileColumnLiteral = createNodeFromNullish(column, c => _core.types.numericLiteral(c + 1));
+    return _core.template.expression.ast`{
+      fileName: ${fileNameIdentifier},
+      lineNumber: ${fileLineLiteral},
+      columnNumber: ${fileColumnLiteral},
+    }`;
   }
-};
-Object.assign(apiPolyfills, {
-  targets: () => () => {
-    return {};
-  },
-  assumption: () => () => {
-    return undefined;
-  },
-  addExternalDependency: () => () => {}
-});
-function declare(builder) {
-  return (api, options, dirname) => {
-    let clonedApi;
-    for (const name of Object.keys(apiPolyfills)) {
-      if (api[name]) continue;
-      clonedApi != null ? clonedApi : clonedApi = copyApiObject(api);
-      clonedApi[name] = apiPolyfills[name](clonedApi);
+  const isSourceAttr = attr => _core.types.isJSXAttribute(attr) && attr.name.name === TRACE_ID;
+  return {
+    name: "transform-react-jsx-source",
+    visitor: {
+      JSXOpeningElement(path, state) {
+        const {
+          node
+        } = path;
+        if (!node.loc || path.node.attributes.some(isSourceAttr)) {
+          return;
+        }
+        if (!state.fileNameIdentifier) {
+          const fileNameId = path.scope.generateUidIdentifier(FILE_NAME_VAR);
+          state.fileNameIdentifier = fileNameId;
+          path.scope.getProgramParent().push({
+            id: fileNameId,
+            init: _core.types.stringLiteral(state.filename || "")
+          });
+        }
+        node.attributes.push(_core.types.jsxAttribute(_core.types.jsxIdentifier(TRACE_ID), _core.types.jsxExpressionContainer(makeTrace(_core.types.cloneNode(state.fileNameIdentifier), node.loc.start))));
+      }
     }
-    return builder(clonedApi != null ? clonedApi : api, options || {}, dirname);
   };
-}
-const declarePreset = exports.declarePreset = declare;
-function copyApiObject(api) {
-  let proto = null;
-  if (typeof api.version === "string" && api.version.startsWith("7.")) {
-    proto = Object.getPrototypeOf(api);
-    if (proto && (!hasOwnProperty.call(proto, "version") || !hasOwnProperty.call(proto, "transform") || !hasOwnProperty.call(proto, "template") || !hasOwnProperty.call(proto, "types"))) {
-      proto = null;
-    }
-  }
-  return Object.assign({}, proto, api);
-}
-function throwVersionError(range, version) {
-  if (typeof range === "number") {
-    if (!Number.isInteger(range)) {
-      throw new Error("Expected string or integer value.");
-    }
-    range = `^${range}.0.0-0`;
-  }
-  if (typeof range !== "string") {
-    throw new Error("Expected string or integer value.");
-  }
-  const limit = Error.stackTraceLimit;
-  if (typeof limit === "number" && limit < 25) {
-    Error.stackTraceLimit = 25;
-  }
-  let err;
-  if (version.startsWith("7.")) {
-    err = new Error(`Requires Babel "^7.0.0-beta.41", but was loaded with "${version}". ` + `You'll need to update your @babel/core version.`);
-  } else {
-    err = new Error(`Requires Babel "${range}", but was loaded with "${version}". ` + `If you are sure you have a compatible version of @babel/core, ` + `it is likely that something in your build process is loading the ` + `wrong version. Inspect the stack trace of this error to look for ` + `the first entry that doesn't mention "@babel/core" or "babel-core" ` + `to see what is calling Babel.`);
-  }
-  if (typeof limit === "number") {
-    Error.stackTraceLimit = limit;
-  }
-  throw Object.assign(err, {
-    code: "BABEL_VERSION_UNSUPPORTED",
-    version,
-    range
-  });
-}
+});
 
 //# sourceMappingURL=index.js.map
